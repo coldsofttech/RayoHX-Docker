@@ -14,7 +14,7 @@ permissions:
 
 env:
   # Set by the Init workflow.
-  IMAGE_NAME: docker-public-repo-template
+  IMAGE_NAME: rayohx
   DOCKERHUB_NAMESPACE: ""
 
 jobs:
