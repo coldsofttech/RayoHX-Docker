@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/coldsofttech/RayoHX-Docker/security/policy
+    about: Please report security problems privately, not as a public issue.
+  - name: Questions and support
+    url: https://github.com/coldsofttech/RayoHX-Docker/blob/main/SUPPORT.md
+    about: See how to get help before opening an issue.
+  - name: Problem with the rayohx command itself
+    url: https://github.com/coldsofttech/RayoHX-CLI/issues
+    about: Options, output and download behaviour belong to the command line repository; this one is for the image.

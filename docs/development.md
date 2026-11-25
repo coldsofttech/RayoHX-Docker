@@ -1,50 +1,43 @@
 # Development
 
-How to work on the image. For how it is built, see [architecture](architecture.md); for releasing, see [packaging](packaging.md).
+How to work on this repository, the RayoHX Docker image. For how the image is built, see [architecture](architecture.md); for running it, see the [Docker guide](docker.md). The pull request process is in the [contributing guide](../CONTRIBUTING.md); tests are described in [testing](testing.md), packaging in [packaging](packaging.md) and releases in [releasing](releasing.md).
 
 ## Build and run
 
-```bash
-docker build -t my-image .
-docker build --build-arg PYTHON_VERSION=3.14 -t my-image:py314 .
-
-docker run --rm my-image
-```
-
-## Tests
-
-The tests are Python, run with pytest, and live in two folders:
-
-| Folder | What it checks | Needs Docker |
-| --- | --- | --- |
-| `tests/unit/` | The application code in `app/` | No |
-| `tests/integration/` | The built image: it runs and stays non-root | Yes |
-
-A plain `pytest` runs only the unit tests. Integration tests carry the `integration` marker and run on request:
+The image installs `rayohx-cli` from PyPI, so a build needs network access and nothing else from the repository:
 
 ```bash
-pip install mypy pytest
-mypy                      # strict type check of app/ and tests/
-pytest                    # unit tests
-pytest -m integration     # builds the image, then tests it
+docker build -t rayohx .
+docker build --build-arg RAYOHX_CLI_VERSION=0.1.0 -t rayohx .
+docker build --build-arg PYTHON_VERSION=3.13 -t rayohx:py313 .
+
+docker run --rm rayohx --version
+docker run --rm rayohx info https://example.com/master.m3u8
 ```
 
-Put anything slow or Docker-dependent under `tests/integration/` so the default run stays fast.
+## Checks
 
-## Continuous integration
+Run only what your change touches:
 
-`.github/workflows/ci.yml` runs on every pull request and push to `main`:
+```bash
+uv run --no-project --with pytest pytest -m integration   # build the image and check it
+uv run --no-project --with mypy --with pytest mypy        # type-check the tests
+docker image ls rayohx --format '{{.Size}}'               # keep an eye on the size
+```
 
-| Job | What it does |
-| --- | --- |
-| `ci` | Runs the pre-commit hooks |
-| `lint` | Lints the `Dockerfile` with hadolint |
-| `tests` | Runs mypy and the unit tests |
-| `int-tests` | Runs the integration tests |
-| `build` | Builds the image without pushing it |
+What the tests check, the fixtures and the smoke test of the image are in [testing](testing.md). CI runs the same checks (`ci.yml`), plus pre-commit and hadolint. Behaviour changes to the command itself belong in the [RayoHX-CLI](https://github.com/coldsofttech/RayoHX-CLI) repository, not here.
 
-These job names are the required status checks in `.github/rulesets/main.json`. If you rename or remove a job, change the ruleset to match, or pull requests will wait for a check that never runs. The Init workflow does this for `tests` and `int-tests` when you turn pytest or mypy off.
+## Rules to keep
 
-## Local checks
+- **One downloader.** Do not add a second implementation to the image. If the image needs something the command does not do, change the command.
+- **Stay non-root.** The runtime stage must end with `USER 10001:10001` (the `rayohx` user, by number), and the image must not run as uid 0.
+- **Keep it small.** No compilers, pip, package caches or FFmpeg in the runtime stage. Add a package only with a reason in the comment.
+- **No secrets in the image.** Never put headers, cookies, tokens or credentials in a `Dockerfile`, build argument or `ENV`. Users pass them at run time (see [security](security.md)).
+- **Keep the build context empty.** The image copies nothing in; if a build ever needs a file, allow only that file in `Dockerfile.dockerignore`.
+- **Explain exceptions.** A `# nosemgrep`, a Trivy ignore or an entry in `.hadolint.yaml` needs a reason in a comment.
 
-Install the commit hooks once: `pre-commit install --hook-type pre-commit --hook-type post-commit`. The post-commit hook runs Sweepito, configured in `sweepito.toml`, to clean caches and BuildKit cache exports.
+## Changing the image
+
+1. Edit `Dockerfile`, keeping the two stages and the comments at the top current.
+2. Build it and run the checks above, on both `amd64` and, if you changed the base or added a package, `arm64` (`docker buildx build --platform linux/arm64 .`).
+3. If the change is visible to users (a folder, variable, user or tag), update the [Docker guide](docker.md), `README.md` and the `[Unreleased]` section of `CHANGELOG.md`.

@@ -1,0 +1,8 @@
+# Findings that are deliberate. Each needs a reason here.
+ignored:
+  # Only zlib1g is upgraded, to take the patched version even when the base image is older than
+  # the fix. Pinning a version would hold back the very update it is there for.
+  - DL3008
+  # pip is upgraded to the latest on purpose, because the base image's own pip bundles libraries
+  # with known vulnerabilities. A pinned version would go stale and bring them back.
+  - DL3013

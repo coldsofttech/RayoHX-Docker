@@ -6,6 +6,7 @@ body:
     id: problem
     attributes:
       label: What problem would this solve?
+      description: This is for the Docker image (folders, user, platforms, tags). Ideas for the `rayohx` command itself belong in the RayoHX-CLI repository.
     validations:
       required: true
   - type: textarea

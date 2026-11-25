@@ -13,3 +13,5 @@
 - [ ] README or docs are updated if behavior changed
 - [ ] The image still builds and runs as a non-root user
 - [ ] No secrets or personal data are in the change or baked into the image
+- [ ] Dockerfile changes: `pytest -m integration` passes
+- [ ] A new `rayohx-cli` version: the pin in the `Dockerfile` and the `CHANGELOG.md` entry both say which version
