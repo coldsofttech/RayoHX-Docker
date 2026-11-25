@@ -1,0 +1,43 @@
+name: Bug report
+description: Report something that is not working as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Image tag or version
+      description: The image tag or digest, or the release or commit you built from.
+      placeholder: ghcr.io/owner/image:1.0.0
+  - type: textarea
+    id: command
+    attributes:
+      label: How you run it
+      description: The `docker run` command, or the Compose file section. Remove any secrets first.
+      render: shell
+  - type: input
+    id: environment
+    attributes:
+      label: Docker and platform
+      description: Output of `docker version --format '{{.Server.Version}}'`, plus your operating system and CPU architecture.
+      placeholder: Docker 27.0.3, Ubuntu 24.04, amd64
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Remove any secrets or personal information first.
