@@ -1,9 +1,9 @@
-# docker-public-repo-template
+# RayoHX-Docker
 
-[![CI](https://github.com/coldsofttech/docker-public-repo-template/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/docker-public-repo-template/actions/workflows/ci.yml)
-[![Release](https://github.com/coldsofttech/docker-public-repo-template/actions/workflows/release.yml/badge.svg)](https://github.com/coldsofttech/docker-public-repo-template/actions/workflows/release.yml)
-[![Docker image](https://img.shields.io/badge/ghcr.io-image-2496ED?logo=docker&logoColor=white)](https://github.com/coldsofttech/docker-public-repo-template/pkgs/container/docker-public-repo-template)
-[![License](https://img.shields.io/github/license/coldsofttech/docker-public-repo-template)](LICENSE)
+[![CI](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/ci.yml)
+[![Release](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/release.yml/badge.svg)](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/release.yml)
+[![Docker image](https://img.shields.io/badge/ghcr.io-image-2496ED?logo=docker&logoColor=white)](https://github.com/coldsofttech/RayoHX-Docker/pkgs/container/rayohx)
+[![License](https://img.shields.io/github/license/coldsofttech/RayoHX-Docker)](LICENSE)
 
 A ready-to-use starting point for public GitHub repositories that ship a Docker image, with community files, issue and pull request templates, automated dependency updates and security checks already in place.
 

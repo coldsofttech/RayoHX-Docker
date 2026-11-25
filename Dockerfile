@@ -27,9 +27,9 @@ COPY app ./app
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 ARG VERSION=0.0.0
-LABEL org.opencontainers.image.title="docker-public-repo-template" \
+LABEL org.opencontainers.image.title="rayohx" \
       org.opencontainers.image.description="Replace with a description of your image" \
-      org.opencontainers.image.source="https://github.com/OWNER/REPOSITORY" \
+      org.opencontainers.image.source="https://github.com/coldsofttech/RayoHX-Docker" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.version="${VERSION}"
 
