@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+  <title>RayoHX Docker: Download HLS streams from a container</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB020"/><stop offset="1" stop-color="#FF4D2E"/></linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="#0D1117"/>
+  <rect x="0" y="0" width="1280" height="8" fill="url(#g)"/>
+
+  <!-- Text, left side -->
+  <text x="80" y="288" font-size="96" font-weight="700" fill="#FFFFFF">RayoHX Docker</text>
+  <text x="84" y="362" font-size="40" fill="#C9D1D9">Download HLS streams from a container</text>
+
+  <!-- Chips -->
+  <g font-size="28" fill="#E6EDF3">
+    <rect x="80" y="420" width="352" height="56" rx="28" fill="#161B22" stroke="#FFB020" stroke-width="2"/>
+    <text x="256" y="458" text-anchor="middle">linux/amd64 · arm64</text>
+    <rect x="452" y="420" width="296" height="56" rx="28" fill="#161B22" stroke="#FFB020" stroke-width="2"/>
+    <text x="600" y="458" text-anchor="middle">Runs as non-root</text>
+  </g>
+
+  <!-- Logo from brand/dark/logo.svg, scaled to 320px -->
+  <g transform="translate(840 160) scale(1.25)">
+    <path d="M52 40 L52 216 L196 128 Z" fill="url(#g)" stroke="url(#g)" stroke-width="22" stroke-linejoin="round"/>
+    <path d="M76 128 H126 M106 104 L130 128 L106 152" fill="none" stroke="#7A1A0A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M190 34 V54 M206 34 V54 M190 44 H206 M216 34 L232 54 M232 34 L216 54" fill="none" stroke="#FFB020" stroke-width="5" stroke-linecap="square"/>
+  </g>
+</svg>

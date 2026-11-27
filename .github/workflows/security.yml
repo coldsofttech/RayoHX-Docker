@@ -1,6 +1,6 @@
 name: Security
 
-# The Dockerfile is scanned by Trivy on every run. The built image is scanned for vulnerable OS and
+# The Dockerfile is scanned by Semgrep and Trivy on every run. The built image is scanned for vulnerable OS and
 # Python packages on the weekly and manual runs only, because it needs a full build and a newly
 # published vulnerability should not fail an unrelated pull request. Findings go to the Security
 # tab as SARIF. These jobs report only; they are not required status checks.
@@ -20,7 +20,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  semgrep:
+    name: semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Scan the Dockerfile and workflows with Semgrep
+        uses: ./.github/actions/semgrep
+        with:
+          configs: p/dockerfile p/github-actions
+          category: semgrep-docker
+
   trivy-config:
+    name: trivy config
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -50,6 +68,7 @@ jobs:
           category: trivy-docker-config
 
   trivy-image:
+    name: trivy image
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 30

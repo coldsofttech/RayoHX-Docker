@@ -24,3 +24,13 @@ repos:
     rev: v0.17.2
     hooks:
       - id: markdownlint-cli2
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        # Dockerfile.dockerignore is an ignore list, not a Dockerfile, but the hook matches its name
+        exclude: ^Dockerfile\.dockerignore$
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint

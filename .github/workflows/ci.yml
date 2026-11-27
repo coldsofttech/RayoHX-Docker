@@ -13,7 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
+  pre-commit:
+    name: pre-commit
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -23,6 +24,7 @@ jobs:
         uses: pre-commit/action@v3.0.1
 
   lint:
+    name: lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -33,7 +35,8 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-  tests:
+  type-check:
+    name: type check
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -45,12 +48,11 @@ jobs:
           python-version: "3.15"
       - name: Install test tools
         run: pip install mypy pytest
-      - name: Type-check with mypy
+      - name: Type-check the tests with mypy
         run: mypy
-      - name: Run unit tests
-        run: pytest
 
   int-tests:
+    name: image tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -62,10 +64,11 @@ jobs:
           python-version: "3.15"
       - name: Install test tools
         run: pip install pytest
-      - name: Run integration tests
+      - name: Build the image and run the image tests
         run: pytest -m integration
 
   build:
+    name: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -78,3 +81,17 @@ jobs:
         with:
           context: .
           push: false
+
+  ci-result:
+    name: ci (required check)
+    if: always()
+    needs: [pre-commit, lint, type-check, int-tests, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check results
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS"
+          jq -e 'all(.[]; .result == "success")' <<< "$NEEDS" > /dev/null

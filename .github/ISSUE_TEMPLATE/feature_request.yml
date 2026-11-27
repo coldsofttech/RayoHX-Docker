@@ -2,10 +2,20 @@ name: Feature request
 description: Suggest an idea or improvement
 labels: [enhancement]
 body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which part is this for?
+      options:
+        - Docker Image
+        - Not Sure
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:
       label: What problem would this solve?
+      description: This is for the Docker image (folders, user, platforms, tags). Ideas for the `rayohx` command itself belong in the RayoHX-CLI repository.
     validations:
       required: true
   - type: textarea

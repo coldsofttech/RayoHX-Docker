@@ -1,46 +1,69 @@
-# A small, non-root image. Replace the build and run steps with your application's.
+# The RayoHX command line as a small, non-root image. It runs the same `rayohx` command as the
+# Python package; there is no second downloader in here.
 #
-#   docker build -t my-image .
-#   docker run --rm my-image
+#   docker run --rm -v "$PWD/downloads:/output" -v rayohx-work:/workspace \
+#       ghcr.io/coldsofttech/rayohx download https://example.com/master.m3u8 -o /output/movie.mp4
+#
+# Muxing is built in, so FFmpeg is not installed. See docs/docker.md.
+#
+# The image installs the published rayohx-cli package from PyPI (which brings the rayohx library),
+# so the build context holds only requirements.txt, where the version is pinned (Dependabot
+# watches that file):
+#
+#   docker build -t rayohx .
 
 ARG PYTHON_VERSION=3.15
 
-# --- build: install dependencies into a virtual environment ------------------------------------
+# --- build: put the command line and its dependencies in a virtual environment ----------------
 FROM python:${PYTHON_VERSION}-slim AS build
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
-WORKDIR /src
-RUN python -m venv /opt/venv
+COPY requirements.txt /requirements.txt
 
-# To install dependencies, add a requirements.txt, allow it in Dockerfile.dockerignore and
-# uncomment these two lines. Copying it before the application keeps the install layer cached
-# until the requirements change.
-#
-# COPY requirements.txt ./
-# RUN /opt/venv/bin/pip install -r requirements.txt
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-compile -r /requirements.txt \
+    && /opt/venv/bin/pip uninstall --yes pip
 
-COPY app ./app
-
-# --- run: the same base without build tools or sources -----------------------------------------
+# --- run: the same base without compilers or pip -----------------------------------------------
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 ARG VERSION=0.0.0
-LABEL org.opencontainers.image.title="rayohx" \
-      org.opencontainers.image.description="Replace with a description of your image" \
+LABEL org.opencontainers.image.title="RayoHX" \
+      org.opencontainers.image.description="HLS download engine and command line" \
       org.opencontainers.image.source="https://github.com/coldsofttech/RayoHX-Docker" \
-      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.version="${VERSION}"
 
-RUN useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin app
+# Take the patched zlib (CVE-2026-85091) even when the base image is older than the fix; this is the
+# only package upgraded, and the package lists are removed again to keep the image small.
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends --only-upgrade zlib1g \
+    && rm -rf /var/lib/apt/lists/*
+
+# The base image's own pip bundles an older msgpack (CVE-2026-114613); a current pip carries the fix.
+# setuptools and wheel are build tools the command never uses, so they are removed (CVE-2025-47273).
+RUN python -m pip install --no-cache-dir --disable-pip-version-check --upgrade pip \
+    && python -m pip uninstall --yes setuptools wheel
+
+# A fixed, unprivileged user, so files written to a mounted folder have a predictable owner.
+RUN groupadd --system --gid 10001 rayohx \
+    && useradd --system --uid 10001 --gid rayohx --no-create-home --shell /usr/sbin/nologin rayohx \
+    && mkdir /output /workspace \
+    && chown rayohx:rayohx /output /workspace
+
 COPY --from=build /opt/venv /opt/venv
-COPY --from=build /src/app /app
 
-ENV PATH="/opt/venv/bin:${PATH}" \
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    RAYOHX_WORKSPACE=/workspace \
+    NO_COLOR=1
 
-USER 10001
-WORKDIR /app
-ENTRYPOINT ["python", "main.py"]
+USER 10001:10001
+WORKDIR /output
+VOLUME ["/output", "/workspace"]
+
+ENTRYPOINT ["rayohx"]
+CMD ["--help"]
