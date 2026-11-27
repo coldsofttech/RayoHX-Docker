@@ -6,6 +6,8 @@ Thanks for taking the time to contribute! By participating you agree to follow t
 
 Open an issue using one of the provided forms. Search existing issues first. For security problems, do **not** open an issue; follow [SECURITY.md](SECURITY.md).
 
+This repository holds only the Docker image and its `Dockerfile`. Changes to the command line belong in [RayoHX-CLI](https://github.com/coldsofttech/RayoHX-CLI), and changes to the download engine in [RayoHX](https://github.com/coldsofttech/RayoHX).
+
 ## Submitting changes
 
 1. Fork the repository and create a branch from `main`.

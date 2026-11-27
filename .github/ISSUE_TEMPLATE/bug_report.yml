@@ -2,6 +2,15 @@ name: Bug report
 description: Report something that is not working as expected
 labels: [bug]
 body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which part is affected?
+      options:
+        - Docker Image
+        - Not Sure
+    validations:
+      required: true
   - type: textarea
     id: what-happened
     attributes:
@@ -23,13 +32,13 @@ body:
     attributes:
       label: Image tag or version
       description: The image tag or digest, or the release or commit you built from.
-      placeholder: ghcr.io/coldsofttech/rayohx:0.1.0
+      placeholder: ghcr.io/coldsofttech/rayohx:0.1.1
   - type: input
     id: cli-version
     attributes:
       label: RayoHX command line version
       description: Output of `docker run --rm <image> --version`.
-      placeholder: rayohx 0.1.0
+      placeholder: rayohx 0.1.1
   - type: textarea
     id: command
     attributes:

@@ -3,6 +3,7 @@
 [![CI](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/ci.yml/badge.svg)](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/ci.yml)
 [![Security](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/security.yml/badge.svg)](https://github.com/coldsofttech/RayoHX-Docker/actions/workflows/security.yml)
 [![GHCR](https://img.shields.io/badge/ghcr.io-coldsofttech%2Frayohx-blue?logo=docker&logoColor=white)](https://github.com/coldsofttech/RayoHX-Docker/pkgs/container/rayohx)
+[![Docker Hub](https://img.shields.io/badge/docker%20hub-coldsoft%2Frayohx-blue?logo=docker&logoColor=white)](https://hub.docker.com/r/coldsoft/rayohx)
 [![Platforms](https://img.shields.io/badge/platforms-linux%2Famd64%20%7C%20linux%2Farm64-blue)](docs/docker.md)
 [![Non-root](https://img.shields.io/badge/runs%20as-non--root-green)](docs/security.md)
 [![Python](https://img.shields.io/badge/base-python%3Aslim-blue?logo=python&logoColor=white)](docs/architecture.md)
@@ -44,14 +45,22 @@ desktop window for Windows and this Docker image. This repository is the **Docke
 - Join separate audio and video into one MP4 without installing FFmpeg
 - Download encrypted (AES-128) streams; protected (DRM) and live streams are refused with an
   explanation
+- Continue interrupted downloads where they stopped, and clean up what they leave behind
+- Download several streams with one command, from addresses or a list file you mount into the container
+- Follow a download from another program with `--events`, or get machine-readable output with `--json`
 - Use proxies, custom headers and cookies when a site needs them
 - Run it from a script, a scheduled job or a CI pipeline
 
 ## Get the image
 
+The same image is published to two registries, under the name `rayohx`. Pull it from either:
+
 ```sh
-docker pull ghcr.io/coldsofttech/rayohx
+docker pull ghcr.io/coldsofttech/rayohx   # GitHub Container Registry
+docker pull coldsoft/rayohx               # Docker Hub
 ```
+
+The examples below use the GitHub Container Registry name; use `coldsoft/rayohx` instead to pull from Docker Hub.
 
 The image is published for `linux/amd64` and `linux/arm64`, so it runs on Intel and AMD servers
 and on Apple silicon and ARM machines. Each release has these tags:
@@ -82,7 +91,22 @@ docker run --rm \
   ghcr.io/coldsofttech/rayohx download https://example.com/master.m3u8 -o /output/movie.mp4
 ```
 
+Check that it works:
+
+```sh
+docker run --rm ghcr.io/coldsofttech/rayohx --version
+```
+
 Everything after the image name is a normal `rayohx` command, so it works as it does in a terminal.
+
+| Command | What it does |
+| --- | --- |
+| `info` | Shows what a stream offers: qualities, audio, subtitles and encryption |
+| `download` | Saves a stream, or several, to a file or a folder of segments |
+| `clean` | Removes leftover working folders from interrupted downloads |
+| `config` | Shows which settings and `RAYOHX_` variables are in effect |
+
+Add `--help` to any command, for example `docker run --rm ghcr.io/coldsofttech/rayohx download --help`, to see every option.
 
 | Folder | Purpose |
 | --- | --- |
@@ -96,7 +120,8 @@ Files are written as uid `10001`. To save files as yourself instead, add
 `--user "$(id -u):$(id -g)"` and mount a writable `/workspace` too; see the [Docker guide](docs/docker.md).
 
 All the releases are on the [releases page](https://github.com/coldsofttech/RayoHX-Docker/releases), and the
-tags are on the [package page](https://github.com/coldsofttech/RayoHX-Docker/pkgs/container/rayohx).
+tags are on the [GitHub package page](https://github.com/coldsofttech/RayoHX-Docker/pkgs/container/rayohx)
+and on [Docker Hub](https://hub.docker.com/r/coldsoft/rayohx/tags).
 
 ## Build it yourself
 

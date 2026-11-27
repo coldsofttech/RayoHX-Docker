@@ -1,7 +1,7 @@
 name: Release
 
 # Publishes the image (linux/amd64 and linux/arm64) when a GitHub release is published, with the tag
-# vX.Y.Z (X.Y.Z, X.Y and, for a full release, latest). Each registry is off until you enable it
+# vX.Y.Z (which must be "v" plus the contents of the VERSION file) (X.Y.Z, X.Y and, for a full release, latest). Each registry is off until you enable it
 # with a repository variable (Settings > Secrets and variables > Actions > Variables):
 #   PUBLISH_GHCR=true         -> ghcr.io/<owner>/<image name>
 #   DOCKERHUB_USERNAME=<name> -> docker.io/<namespace>/<image name> (also needs the
@@ -13,15 +13,40 @@ on:
 permissions:
   contents: read
 
+# One publish per release tag at a time; a second run waits instead of racing the first.
+concurrency:
+  group: release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
 env:
-  # Set by the Init workflow.
+  # The image name, and the Docker Hub namespace when it differs from the username.
   IMAGE_NAME: rayohx
   DOCKERHUB_NAMESPACE: ""
 
 jobs:
+  check:
+    name: Check the tag
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Check the tag matches the VERSION file
+        id: version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          [ -n "$version" ] && [ "$TAG" = "v$version" ] || { echo "Tag $TAG does not match version $version"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   publish-ghcr:
     name: Publish to GitHub Container Registry
-    if: vars.PUBLISH_GHCR == 'true'
+    needs: check
+    if: vars.PUBLISH_GHCR == 'true' && startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: docker
@@ -49,6 +74,8 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
+          flavor: latest=false
       - name: Build and push the image
         uses: docker/build-push-action@v7
         with:
@@ -56,18 +83,24 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           provenance: true
-          build-args: VERSION=${{ steps.meta.outputs.version }}
+          build-args: VERSION=${{ needs.check.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
   publish-dockerhub:
     name: Publish to Docker Hub
-    if: vars.DOCKERHUB_USERNAME != ''
+    needs: check
+    if: vars.DOCKERHUB_USERNAME != '' && startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment: docker
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
       - name: Log in to Docker Hub
         uses: docker/login-action@v4
         with:
@@ -81,11 +114,15 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
+          flavor: latest=false
       - name: Build and push the image
         uses: docker/build-push-action@v7
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           push: true
-          build-args: VERSION=${{ steps.meta.outputs.version }}
+          provenance: true
+          build-args: VERSION=${{ needs.check.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

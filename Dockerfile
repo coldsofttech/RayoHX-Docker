@@ -7,23 +7,23 @@
 # Muxing is built in, so FFmpeg is not installed. See docs/docker.md.
 #
 # The image installs the published rayohx-cli package from PyPI (which brings the rayohx library),
-# so the build context holds nothing. Choose the version with RAYOHX_CLI_VERSION:
+# so the build context holds only requirements.txt, where the version is pinned (Dependabot
+# watches that file):
 #
 #   docker build -t rayohx .
-#   docker build --build-arg RAYOHX_CLI_VERSION=0.1.0 -t rayohx .
 
 ARG PYTHON_VERSION=3.15
 
 # --- build: put the command line and its dependencies in a virtual environment ----------------
 FROM python:${PYTHON_VERSION}-slim AS build
 
-ARG RAYOHX_CLI_VERSION=0.1.0
-
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
+COPY requirements.txt /requirements.txt
+
 RUN python -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-compile "rayohx-cli==${RAYOHX_CLI_VERSION}" \
+    && /opt/venv/bin/pip install --no-compile -r /requirements.txt \
     && /opt/venv/bin/pip uninstall --yes pip
 
 # --- run: the same base without compilers or pip -----------------------------------------------

@@ -9,3 +9,6 @@ contact_links:
   - name: Problem with the rayohx command itself
     url: https://github.com/coldsofttech/RayoHX-CLI/issues
     about: Options, output and download behaviour belong to the command line repository; this one is for the image.
+  - name: Problem with the download engine or Python library
+    url: https://github.com/coldsofttech/RayoHX/issues
+    about: Stream handling and the rayohx library belong to the RayoHX repository.

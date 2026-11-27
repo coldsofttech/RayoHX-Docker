@@ -5,6 +5,9 @@ risk = "safe"
 [clean]
 # Local BuildKit cache exports, which the default risk skips. The next image build is slower.
 enable = ["docker.buildx-cache"]
+# Exclusions always win over cleanup rules. Keep the uv environment and the local image build
+# files (scripts/dev/local.py) between commits.
+exclude = [".venv/", ".local/"]
 
 [hook]
 quiet = true

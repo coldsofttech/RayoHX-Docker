@@ -19,11 +19,7 @@ python scripts/smoke/test_image.py    # shows the user the container runs as, th
 
 ### `setup_image.py`
 
-Builds the `Dockerfile` in the repository root as `rayohx:local-test`, with `VERSION=0.0.0-local`.
-
-| Option | What it does |
-|---|---|
-| `--cli-version VERSION` | Install this `rayohx-cli` version from PyPI instead of the Dockerfile's default, for example `--cli-version 0.1.0`. |
+Builds the `Dockerfile` in the repository root as `rayohx:local-test`, with `VERSION=<contents of the VERSION file>-local`. It installs the `rayohx-cli` version pinned in `requirements.txt`; edit that file to try another version.
 
 ### `test_image.py`
 

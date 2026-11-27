@@ -4,9 +4,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-27
+
+### Added
+
+- Releases can also be published to Docker Hub as `coldsoft/rayohx`, after a reviewer approves them.
+
 ### Changed
 
 - The image now uses Python 3.15 (it was 3.13).
+- The image now installs `rayohx-cli` 0.1.1 by default (it was 0.1.0).
 - The image now installs the published `rayohx-cli` package, pinned to one version, instead of building it from source.
 
 ### Security

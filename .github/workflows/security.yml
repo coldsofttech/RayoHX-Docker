@@ -21,6 +21,7 @@ concurrency:
 
 jobs:
   semgrep:
+    name: semgrep
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -30,13 +31,14 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
-      - name: Scan the Dockerfile with Semgrep
+      - name: Scan the Dockerfile and workflows with Semgrep
         uses: ./.github/actions/semgrep
         with:
-          configs: p/dockerfile
+          configs: p/dockerfile p/github-actions
           category: semgrep-docker
 
   trivy-config:
+    name: trivy config
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -66,6 +68,7 @@ jobs:
           category: trivy-docker-config
 
   trivy-image:
+    name: trivy image
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 30
