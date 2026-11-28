@@ -138,7 +138,7 @@ This installs the published `rayohx-cli` package from PyPI, so the build needs n
 | --- | --- |
 | The `rayohx` command, installed with Python | [`rayohx-cli`](https://pypi.org/project/rayohx-cli/) |
 | Python library, to use RayoHX inside your own programs | [`rayohx`](https://pypi.org/project/rayohx/) |
-| Desktop window for Windows | The full setup on the [RayoHX-Installer releases page](https://github.com/coldsofttech/RayoHX-Installer/releases) |
+| Desktop window for Windows | The full setup on the [RayoHX-Desktop releases page](https://github.com/coldsofttech/RayoHX-Desktop/releases) |
 
 ## Learn more
 
